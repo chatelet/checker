@@ -23,8 +23,8 @@ class Board
   end
 
   def display
-    puts " 0123456789"
-    puts " ----------"
+    puts " 01234567"
+    puts " --------"
     count = 0
     @grid.each do |row|
       str = count.to_s
@@ -43,22 +43,36 @@ class Board
 
       count += 1
     end
-    puts " ----------"
-    puts " 0123456789"
+    puts " --------"
+    puts " 01234567"
+  end
+
+  def lose_no_piece?(color)
+    return true if pieces.select{|el| el.color == color}.count == 0
+    false
+  end
+
+  def lose_no_move?(color)
+    num_slide = 0
+    num_jump = 0
+    pieces.select{|el| el.color == color}.each do |i|
+      return false if !i.possible_slide_moves.empty? || !i.possible_jump_moves.empty?
+    end
+    true
   end
 
   def play
-    flag = 'w'
-    loop do
+    flag = :white
+    while !lose_no_piece?(flag) || !lose_no_move?(flag)
       #check if there is piece in current player that can perform a jump
-      if flag == 'w'
+      if flag == :white
         piece_same_color = pieces.select{|el| el.color == :white}
         p "white's turn"
-        flag = 'b'
+        flag = :black
       else
         piece_same_color = pieces.select{|el| el.color == :black}
         p "black's turn"
-        flag = 'w'
+        flag = :white
       end
 
       jump_flag = false
@@ -93,8 +107,8 @@ class Board
       end
 
       next if jump_flag
-      
-      puts "choose a piece 9,9"
+
+      puts "choose a piece 0, 1"
       input = gets.chomp
       pos_start = []
       input.split(',').each do |i|
@@ -123,21 +137,12 @@ break if pos_start == [10, 10]
         end
       end
     end
+    if flag == :white
+      p "white lose"
+    else
+      p "black lose"
+    end
   end
-
-
-
-      # if jump_move?(pos_start, pos_dest)
-      #   p "have to do a jump not a slide, available jumps are "
-      #   self[pos_start].perform_jump(pos_dest)
-      #   p "jump"
-      # else
-      #   if slide_move?(pos_start, pos_dest)
-      #     self[pos_start].perform_slide(pos_dest)
-      #     p "slide"
-      #   end
-      # end
-
 
   def slide_move?(pos_start, pos_dest)
     tmp = self[pos_start].possible_slide_moves
@@ -154,25 +159,25 @@ break if pos_start == [10, 10]
 
   private
   def fill_board_with_piece
-    (0..3).each do |i|
+    (0..2).each do |i|
       if i % 2 == 0
-        (0..4).each do |j|
+        (0..3).each do |j|
           self[[i, j * 2 + 1]] = Piece.new(self, :black, [i, j * 2 + 1])
         end
       else
-        (0..4).each do |j|
+        (0..3).each do |j|
           self[[i, j * 2]] = Piece.new(self, :black, [i, j * 2])
         end
       end
     end
 
-    (6..9).each do |i|
+    (5..7).each do |i|
       if i % 2 == 0
-        (0..4).each do |j|
+        (0..3).each do |j|
           self[[i, j * 2 + 1]] = Piece.new(self, :white, [i, j * 2 + 1])
         end
       else
-        (0..4).each do |j|
+        (0..3).each do |j|
           self[[i, j * 2]] = Piece.new(self, :white, [i, j * 2])
         end
       end
@@ -180,7 +185,7 @@ break if pos_start == [10, 10]
   end
 
   def make_starting_board(fill)
-    @grid = Array.new(10) {Array.new(10)}
+    @grid = Array.new(8) {Array.new(8)}
     return unless fill
     fill_board_with_piece
   end

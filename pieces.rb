@@ -18,14 +18,14 @@ class Piece
     return if @promote
     case color
     when :black
-      @promote = true if pos[0] == 9
+      @promote = true if pos[0] == 7
     when :white
       @promote = true if pos[0] == 0
     end
   end
 
   def valid_pos?(pos)
-    return true if pos[0].between?(0, 9) && pos[1].between?(0, 9)
+    return true if pos[0].between?(0, 7) && pos[1].between?(0, 7)
     #raise "not a valid the move"
   end
 
